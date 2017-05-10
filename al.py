@@ -7,8 +7,9 @@ import os
 import sys
 import commands
 from multiprocessing import Process
+import webbrowser
 #http://api.wolframalpha.com/v2/query?appid=6QPQYJ-LHQPAEYTWW&input=population%20france
-#  &output=json&format=plaintext&podtitle=Result
+ # &output=json&format=plaintext&podtitle=Result
 #fn to find the path of folder
 #getting the name of user logged in fro his home folder
 
@@ -66,7 +67,7 @@ def path_finder(var):
 def main():
 
 	url = "http://api.wolframalpha.com/v2/query?appid=6QPQYJ-LHQPAEYTWW&input="
-	url_end = "&output=json&format=plaintext&podtitle=Result"
+	url_end = "&output=json&format=plaintext"
 	operator = {'+':'%2B', '-':'%2D', '*':'%2A', '/':'%2F', '%':'%25', '^':'%5E','!':'%21', '$':'%24', '&':'%26', '(':'%28', ')':'%29', '{':'%7B','}':'%7D', '[':'%5B', ']':'%5D', '#':'%23'}
 
 	os.system('echo "HELLO MASTER  " > '+tts_path)
@@ -182,12 +183,35 @@ def main():
 				else:
 					url_inp += operator[x]
 				url_inp += '+'
-			result_json = requests.get(url+url_inp+url_end)
+			result_json = requests.get(url+url_inp+url_end+"&podtitle=Result")
 			result = json.loads(result_json.text)
 			if(result['queryresult']['success'] == 'False'):
 				print "Query Failed"
+				os.system('echo "Query Failed  " > '+tts_path)
+				os.system("festival --tts "+tts_path)  	
+
 			else:
-				print result['queryresult']['pods'][0]['subpods'][0]['plaintext']
+				try:
+					res = result['queryresult']['pods'][0]['subpods'][0]['plaintext']
+					print res
+					os.system('echo "'+res+'" > '+tts_path)
+					os.system("festival --tts "+tts_path)
+				except KeyError:
+					if(inp[0] == 'who'  and inp[1] == 'is'):
+						result_json = requests.get(url+url_inp+url_end+"&podtitle=Wikipedia+summary")
+						result = json.loads(result_json.text)
+						res = result['queryresult']['pods'][0]['infos']['links']['url']
+						webbrowser.open(res)
+					else:
+						result_json = requests.get(url+url_inp+url_end+"&podtitle=Decimal+approximation")
+						result = json.loads(result_json.text)
+						#print result
+						res = result['queryresult']['pods'][0]['subpods'][0]['plaintext']
+						print res
+						
+
+											
+				  	
 
 
 		inp = raw_input(">\t")
