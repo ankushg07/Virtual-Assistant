@@ -44,7 +44,7 @@ def path_finder(var):
 
 inp = raw_input()
 inp=inp.lower()
-inp = inp.split(' ')
+inp = inp.split(" ")
 
 
 # ***** Fn 1 ls command == open folder **********
