@@ -1,6 +1,7 @@
 #! /usr/bin/python
 
 import urllib2
+import urllib
 import json
 import requests
 import os
@@ -8,6 +9,7 @@ import sys
 import commands
 from multiprocessing import Process
 import webbrowser
+from bs4 import BeautifulSoup
 #http://api.wolframalpha.com/v2/query?appid=6QPQYJ-LHQPAEYTWW&input=population%20france
  # &output=json&format=plaintext&podtitle=Result
 #fn to find the path of folder
@@ -173,6 +175,21 @@ def main():
 			 	if(choice == 'yes'):
 			 		status = os.system("gedit "+path+"/"+inp[2])
 
+		#music and videos
+		elif(inp[0] == 'play' and (inp[1] == 'song' or inp[1] == 'video') ):
+			song_url1 = ""
+			for it in inp[2:len(inp)]:
+
+				song_url1+=it
+				song_url1+=' '
+			query = urllib.quote(song_url1)
+			song_url = "https://www.youtube.com/results?search_query=" + query
+			response = urllib2.urlopen(song_url)
+			html = response.read()
+			soup = BeautifulSoup(html,"lxml")
+			vid = soup.find(attrs={'class':'yt-uix-tile-link'})
+			webbrowser.open("https://www.youtube.com"+vid['href'] )
+    
 		# web serach and use of wolfame api 
 		else:
 			url_inp = ""
